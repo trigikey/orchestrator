@@ -1,122 +1,152 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useRef, useState } from 'react'
+import { validateFiles } from './api'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+const STATUS = {
+  OK: { label: 'Ошибок нет', cls: 'ok' },
+  ERRORS: { label: 'Есть ошибки', cls: 'err' },
+  UNRECOGNIZED: { label: 'Не распознан', cls: 'warn' },
+  FAILED: { label: 'Не прочитан', cls: 'fail' },
+}
 
+const fmt = (n) => Number(n).toLocaleString('ru-RU')
+
+function Summary({ summary }) {
+  const items = [
+    ['Файлов', summary.tables, ''],
+    ['Без ошибок', summary.ok, 'ok'],
+    ['С ошибками', summary.withErrors, 'err'],
+    ['Не распознано', summary.unrecognized, 'warn'],
+    ['Не прочитано', summary.failed, 'fail'],
+    ['Всего ошибок', summary.totalIssues, 'err'],
+  ]
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="summary">
+      {items.map(([label, value, cls]) => (
+        <div key={label} className={`stat ${value > 0 ? cls : ''}`}>
+          <b>{fmt(value)}</b>
+          <span>{label}</span>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      ))}
+    </div>
   )
 }
 
-export default App
+function ColumnReport({ report }) {
+  const hidden = report.errorCount - report.issues.length
+  return (
+    <div className="column">
+      <div className="column-head">
+        <code>{report.column}</code>
+        <span className="muted">
+          ошибок: {fmt(report.errorCount)} · проверено строк: {fmt(report.checked)}
+        </span>
+      </div>
+      <p className="rule">Правило: {report.rule}</p>
+      <div className="scroll">
+        <table>
+          <thead>
+            <tr><th>Строка</th><th>Значение</th><th>Причина</th></tr>
+          </thead>
+          <tbody>
+            {report.issues.map((issue, i) => (
+              <tr key={i}>
+                <td>{issue.row > 0 ? issue.row : '—'}</td>
+                <td className="mono">{issue.value || <span className="muted">пусто</span>}</td>
+                <td>{issue.message}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {hidden > 0 && <p className="muted small">Показаны первые {report.issues.length}, ещё {fmt(hidden)} не показаны.</p>}
+    </div>
+  )
+}
+
+function FileCard({ file }) {
+  const status = STATUS[file.status] ?? STATUS.FAILED
+  return (
+    <details className="card" open={file.status === 'ERRORS'}>
+      <summary>
+        <span className={`badge ${status.cls}`}>{status.label}</span>
+        <span className="file-name">{file.fileName}</span>
+        {file.recognized && <span className="muted">{file.table}</span>}
+      </summary>
+      <div className="card-body">
+        <p>{file.message}</p>
+        {file.recognized && (
+          <p className="muted small">
+            Строк: {fmt(file.rows)} · колонок в схеме: {fmt(file.columns)} · ошибок: {fmt(file.errorCount)} в колонках: {fmt(file.columnsWithErrors)}
+          </p>
+        )}
+        {file.warnings.length > 0 && (
+          <ul className="warnings">
+            {file.warnings.map((w, i) => <li key={i}>{w}</li>)}
+          </ul>
+        )}
+        {file.columnReports.map((r) => <ColumnReport key={r.column} report={r} />)}
+      </div>
+    </details>
+  )
+}
+
+export default function App() {
+  const inputRef = useRef(null)
+  const [dragging, setDragging] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [result, setResult] = useState(null)
+
+  async function run(fileList) {
+    const files = [...fileList]
+    if (!files.length) return
+    setLoading(true)
+    setError('')
+    try {
+      setResult(await validateFiles(files))
+    } catch (e) {
+      setResult(null)
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <main className="page">
+      <header>
+        <h1>Проверка XLSX-выгрузок</h1>
+        <p className="muted">Перетащите таблицы — таблица определится по шапке, а ошибки появятся ниже.</p>
+      </header>
+
+      <div
+        className={`drop ${dragging ? 'drag' : ''} ${loading ? 'busy' : ''}`}
+        onClick={() => !loading && inputRef.current.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => { e.preventDefault(); setDragging(false); if (!loading) run(e.dataTransfer.files) }}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          accept=".xlsx,.xls"
+          hidden
+          onChange={(e) => { run(e.target.files); e.target.value = '' }}
+        />
+        <strong>{loading ? 'Проверяем…' : 'Перетащите .xlsx сюда'}</strong>
+        <span className="muted">{loading ? 'Это может занять время для больших файлов' : 'или нажмите, чтобы выбрать файлы (до 50 МБ каждый)'}</span>
+      </div>
+
+      {error && <div className="alert">{error}</div>}
+
+      {result && (
+        <section className="results">
+          <Summary summary={result.summary} />
+          {result.files.map((f, i) => <FileCard key={`${f.fileName}-${i}`} file={f} />)}
+        </section>
+      )}
+    </main>
+  )
+}
