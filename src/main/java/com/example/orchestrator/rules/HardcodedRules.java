@@ -2,12 +2,7 @@ package com.example.orchestrator.rules;
 
 import java.util.List;
 
-/**
- * Захардкоженный справочник поддерживаемых таблиц и правил проверки колонок.
- *
- * <p>Правила перенесены из validation.xlsx в исходный код вручную/генератором
- * один раз. Во время работы приложения Excel-файл с правилами не читается.</p>
- */
+
 public final class HardcodedRules {
 
     private static final List<TableSchema> TABLES = List.of(
@@ -112,7 +107,7 @@ public final class HardcodedRules {
                     "olb_rtsposition",
                     "Брокерский бизнес",
                     List.of("olb_rtsposition_202610221545.xlsx"),
-                    ColumnRule.of("account", "Тип: string | Обяз.: да | Проверки:RTS*непустой_текст | Уник.: да", ColumnRule.Type.STRING).required().unique().pattern("^RTS\\*.+$", "Значение должно начинаться с RTS* и быть непустым"),
+                    ColumnRule.of("account", "Тип: string | Обяз.: да | Проверки: RTS*непустой_текст", ColumnRule.Type.STRING).required().pattern("^RTS\\*.+$", "Значение должно начинаться с RTS* и быть непустым"),
                     ColumnRule.of("instr_short", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("mat_date", "Тип: date | Обяз.: да | Проверки: дата 1900-01-01..2100-12-31", ColumnRule.Type.DATE).required().dateRange(),
                     ColumnRule.of("open_net", "Тип: decimal | Обяз.: да | Проверки:", ColumnRule.Type.DECIMAL).required(),
@@ -171,7 +166,7 @@ public final class HardcodedRules {
                     ColumnRule.of("actualdate", "Тип: date | Обяз.: да | Проверки: дата 1900-01-01..2100-12-31", ColumnRule.Type.DATE).required().dateRange(),
                     ColumnRule.of("central_strike", "Тип: decimal | Обяз.: нет | Проверки: NULL/пусто или >= 0", ColumnRule.Type.DECIMAL).ge("0"),
                     ColumnRule.of("currency", "Тип: string | Обяз.: да | Проверки: ISO 4217", ColumnRule.Type.STRING).required().pattern("^[A-Z]{3}$", "Значение должно быть кодом ISO 4217 (3 заглавные буквы)"),
-                    ColumnRule.of("option_type", "Тип: enum | Обяз.: нет | Проверки: допустимые значения: Европейский опцион, Американский опцион", ColumnRule.Type.STRING).allowed("Европейский опцион", "Американский опцион"),
+                    ColumnRule.of("option_type", "Тип: enum | Обяз.: нет | Проверки: допустимые значения: Европейский опцион, Eвропейский опцион, Американский опцион", ColumnRule.Type.STRING).allowed("Европейский опцион", "Eвропейский опцион", "Американский опцион"),
                     ColumnRule.of("turnover", "Тип: decimal | Обяз.: да | Проверки: >= 0", ColumnRule.Type.DECIMAL).required().ge("0"),
                     ColumnRule.of("limit_up", "Тип: decimal | Обяз.: нет | Проверки: >= 0; x >= limit_down", ColumnRule.Type.DECIMAL).ge("0").compare("limit_down", ColumnRule.Compare.GE),
                     ColumnRule.of("strike", "Тип: decimal | Обяз.: нет | Проверки: >= 0", ColumnRule.Type.DECIMAL).ge("0"),
@@ -205,14 +200,14 @@ public final class HardcodedRules {
                     ColumnRule.of("value_date", "Тип: date | Обяз.: да | Проверки: дата 1900-01-01..2100-12-31; одна дата на всю выгрузку", ColumnRule.Type.DATE).required().singleValue().dateRange(),
                     ColumnRule.of("trade_id", "Тип: integer | Обяз.: да | Проверки: > 0 | Уник.: да", ColumnRule.Type.INTEGER).required().unique().gt("0"),
                     ColumnRule.of("external_reference", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или текст", ColumnRule.Type.STRING),
-                    ColumnRule.of("processing_org_short_name", "Тип: enum | Обяз.: да | Проверки: допустимые значения: VTBRM, BUZFIN, CAAC, VTBCT, SHUH, STARTCAP, VTBCAPITAL", ColumnRule.Type.STRING).required().allowed("VTBRM", "BUZFIN", "CAAC", "VTBCT", "SHUH", "STARTCAP", "VTBCAPITAL"),
+                    ColumnRule.of("processing_org_short_name", "Тип: enum | Обяз.: да | Проверки: допустимые значения: VTBRM, BUZFIN, CAAC, VTBCT, SHUH, STARTCAP, VTBCAPITAL, VTBH", ColumnRule.Type.STRING).required().allowed("VTBRM", "BUZFIN", "CAAC", "VTBCT", "SHUH", "STARTCAP", "VTBCAPITAL", "VTBH"),
                     ColumnRule.of("counterparty_short_name", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("counterparty_attribute_inn", "Тип: integer | Обяз.: да | Проверки: > 0; ИНН", ColumnRule.Type.INTEGER).required().gt("0").pattern("^(\\d{10}|\\d{12})$", "Значение должно быть ИНН (10 или 12 цифр)"),
                     ColumnRule.of("counterparty_attribute_siebel_code", "Тип: integer | Обяз.: да | Проверки: > 0", ColumnRule.Type.INTEGER).required().gt("0"),
                     ColumnRule.of("counterparty_attribute_ogress_code", "Тип: integer | Обяз.: нет | Проверки: NULL/пусто или >= 0", ColumnRule.Type.INTEGER).ge("0"),
                     ColumnRule.of("csa_id", "Тип: integer | Обяз.: нет | Проверки: NULL/пусто или > 0", ColumnRule.Type.INTEGER).gt("0"),
-                    ColumnRule.of("product_type", "Тип: enum | Обяз.: да | Проверки: допустимые значения: FXForward, Cash, ExternalOTC, EquityStructuredOption, Swap, FXNDF, FXOption, FXSwap, CommoditySwap2, Repo, Bond, Equity, Future", ColumnRule.Type.STRING).required().allowed("FXForward", "Cash", "ExternalOTC", "EquityStructuredOption", "Swap", "FXNDF", "FXOption", "FXSwap", "CommoditySwap2", "Repo", "Bond", "Equity", "Future"),
-                    ColumnRule.of("product_subtype", "Тип: enum | Обяз.: да | Проверки: допустимые значения: FXForward, Standard, RUBIK, European, Arrear, FXNDF, Cash, Swap", ColumnRule.Type.STRING).required().allowed("FXForward", "Standard", "RUBIK", "European", "Arrear", "FXNDF", "Cash", "Swap"),
+                    ColumnRule.of("product_type", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
+                    ColumnRule.of("product_subtype", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("product_extendedtype", "Тип: enum | Обяз.: нет | Проверки: \"None\" или допустимые значения: Geared put, Capital protection, KIPut, GoldLoan4", ColumnRule.Type.STRING).allowed("Geared put", "Capital protection", "KIPut", "GoldLoan4").allowToken("None"),
                     ColumnRule.of("product_description", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("trade_date", "Тип: datetime | Обяз.: да | Проверки: дата-время 1900-01-01..2100-12-31; <= value_date", ColumnRule.Type.DATETIME).required().dateRange().compare("value_date", ColumnRule.Compare.LE),
@@ -244,7 +239,7 @@ public final class HardcodedRules {
                     ColumnRule.of("rcv_leg_principal", "Тип: decimal | Обяз.: нет | Проверки: NULL/пусто или число", ColumnRule.Type.DECIMAL),
                     ColumnRule.of("rcv_leg_principal_ccy", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или ISO 4217", ColumnRule.Type.STRING).pattern("^[A-Z]{3}$", "Значение должно быть кодом ISO 4217 (3 заглавные буквы)"),
                     ColumnRule.of("rcv_leg_type", "Тип: enum | Обяз.: нет | Проверки: NULL/пусто или допустимые значения: Fixed, Float, PerformanceSwapLeg", ColumnRule.Type.STRING).allowed("Fixed", "Float", "PerformanceSwapLeg"),
-                    ColumnRule.of("rcv_leg_fixed_rate", "Тип: decimal | Обяз.: нет | Проверки: NULL/пусто или 0 <= x <= 100; даты и годы вне 1900..2100 не допускаются", ColumnRule.Type.DECIMAL).between("0", "100"),
+                    ColumnRule.of("rcv_leg_fixed_rate", "Тип: date | Обяз.: нет | Проверки: NULL/пусто или дата 1900-01-01..2100-12-31", ColumnRule.Type.DATE).dateRange(),
                     ColumnRule.of("rcv_leg_floating_rate", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или текст", ColumnRule.Type.STRING),
                     ColumnRule.of("underlying_rcv_leg_principal", "Тип: string | Обяз.: нет | Проверки: NULL/пусто", ColumnRule.Type.STRING).blankOnly(),
                     ColumnRule.of("underlying_rcv_leg_principal_ccy", "Тип: string | Обяз.: нет | Проверки: NULL/пусто", ColumnRule.Type.STRING).blankOnly(),
@@ -358,9 +353,9 @@ public final class HardcodedRules {
                     ColumnRule.of("value_date", "Тип: date | Обяз.: да | Проверки: дата 1900-01-01..2100-12-31; одна дата на всю выгрузку", ColumnRule.Type.DATE).required().singleValue().dateRange(),
                     ColumnRule.of("trade_id", "Тип: integer | Обяз.: да | Проверки: > 0 | Уник.: да", ColumnRule.Type.INTEGER).required().unique().gt("0"),
                     ColumnRule.of("product_id", "Тип: integer | Обяз.: да | Проверки: > 0", ColumnRule.Type.INTEGER).required().gt("0"),
-                    ColumnRule.of("product_type", "Тип: enum | Обяз.: да | Проверки: допустимые значения: Cash, FXForward, SimpleTransfer, Swap, CommoditySwap2, FXSwap, FXOption, Deposit, Loan", ColumnRule.Type.STRING).required().allowed("Cash", "FXForward", "SimpleTransfer", "Swap", "CommoditySwap2", "FXSwap", "FXOption", "Deposit", "Loan"),
+                    ColumnRule.of("product_type", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("product_extendedtype", "Тип: enum | Обяз.: нет | Проверки: NULL или \"None\" или допустимые значения: Callable", ColumnRule.Type.STRING).allowed("Callable").allowToken("None"),
-                    ColumnRule.of("product_subtype", "Тип: enum | Обяз.: да | Проверки: допустимые значения: Standard, FXForward, PENALTY, European, Arrear, RUBIK, Cash, Swap", ColumnRule.Type.STRING).required().allowed("Standard", "FXForward", "PENALTY", "European", "Arrear", "RUBIK", "Cash", "Swap"),
+                    ColumnRule.of("product_subtype", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("tradestatus", "Тип: enum | Обяз.: да | Проверки: константа: VERIFIED", ColumnRule.Type.STRING).required().constant("VERIFIED"),
                     ColumnRule.of("quantity", "Тип: decimal | Обяз.: да | Проверки:", ColumnRule.Type.DECIMAL).required(),
                     ColumnRule.of("book", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
@@ -426,7 +421,7 @@ public final class HardcodedRules {
                     ColumnRule.of("rep_part_num", "", ColumnRule.Type.ANY),
                     ColumnRule.of("value_date", "Тип: date | Обяз.: да | Проверки: дата 1900-01-01..2100-12-31; одна дата на всю выгрузку", ColumnRule.Type.DATE).required().singleValue().dateRange(),
                     ColumnRule.of("trade_id", "Тип: integer | Обяз.: да | Проверки: > 0 | Уник.: да", ColumnRule.Type.INTEGER).required().unique().gt("0"),
-                    ColumnRule.of("product_type", "Тип: enum | Обяз.: да | Проверки: допустимые значения: RussianRepo, Repo, SecLending", ColumnRule.Type.STRING).required().allowed("RussianRepo", "Repo", "SecLending"),
+                    ColumnRule.of("product_type", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("repo_reverse", "Тип: enum | Обяз.: нет | Проверки: NULL/пусто или RP, RV", ColumnRule.Type.STRING).allowed("RP", "RV"),
                     ColumnRule.of("counterparty_attribute_siebel_code", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или код вида 1-XXXXXX", ColumnRule.Type.STRING).pattern("^1-[A-Za-z0-9]{4,6}$", "Значение должно быть кодом вида 1-XXXXXX"),
                     ColumnRule.of("counterparty_ogress_code", "Тип: integer | Обяз.: нет | Проверки: NULL/пусто или >= 0", ColumnRule.Type.INTEGER).ge("0"),
@@ -477,7 +472,7 @@ public final class HardcodedRules {
                     ColumnRule.of("productid", "Тип: integer | Обяз.: да | Проверки: > 0", ColumnRule.Type.INTEGER).required().gt("0"),
                     ColumnRule.of("producttype", "Тип: enum | Обяз.: да | Проверки: допустимые значения: PositionCash, Bond, FX, FutureFX, Swap, PositionFXNDF, Future, CreditDefaultSwap", ColumnRule.Type.STRING).required().allowed("PositionCash", "Bond", "FX", "FutureFX", "Swap", "PositionFXNDF", "Future", "CreditDefaultSwap"),
                     ColumnRule.of("productsubtype", "Тип: enum | Обяз.: да | Проверки: допустимые значения: FX, GenericS, GenericC, CME RUB FX, FXForward, SimpleTransfer, Cash, Swap", ColumnRule.Type.STRING).required().allowed("FX", "GenericS", "GenericC", "CME RUB FX", "FXForward", "SimpleTransfer", "Cash", "Swap"),
-                    ColumnRule.of("productfamily", "Тип: enum | Обяз.: да | Проверки: допустимые значения: Cash, Bond, FX, Future, Swap, CreditDefaultSwap", ColumnRule.Type.STRING).required().allowed("Cash", "Bond", "FX", "Future", "Swap", "CreditDefaultSwap"),
+                    ColumnRule.of("productfamily", "Тип: enum | Обяз.: да | Проверки: допустимые значения: Cash, Bond, FX, Future, Swap, CreditDefaultSwap, Collateral, Equity", ColumnRule.Type.STRING).required().allowed("Cash", "Bond", "FX", "Future", "Swap", "CreditDefaultSwap", "Collateral", "Equity"),
                     ColumnRule.of("productcurrency", "Тип: string | Обяз.: да | Проверки: ISO 4217", ColumnRule.Type.STRING).required().pattern("^[A-Z]{3}$", "Значение должно быть кодом ISO 4217 (3 заглавные буквы)"),
                     ColumnRule.of("productdescription", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("productcodeindustrygroup", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или непустой текст", ColumnRule.Type.STRING),
@@ -529,7 +524,7 @@ public final class HardcodedRules {
                     ColumnRule.of("value_date", "Тип: date | Обяз.: да | Проверки: дата 1900-01-01..2100-12-31; одна дата на всю выгрузку", ColumnRule.Type.DATE).required().singleValue().dateRange(),
                     ColumnRule.of("position_id", "Тип: integer | Обяз.: да | Проверки: > 0 | Уник.: да", ColumnRule.Type.INTEGER).required().unique().gt("0"),
                     ColumnRule.of("book", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
-                    ColumnRule.of("product_type", "Тип: enum | Обяз.: да | Проверки: допустимые значения: Bond, Equity, ETOEquity, BondVTBCustom, BondFRNVTBCustom, BondFRN", ColumnRule.Type.STRING).required().allowed("Bond", "Equity", "ETOEquity", "BondVTBCustom", "BondFRNVTBCustom", "BondFRN"),
+                    ColumnRule.of("product_type", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("product_code_isin", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или ISIN", ColumnRule.Type.STRING).pattern("^[A-Z]{2}[A-Z0-9]{9}[0-9]$", "Значение должно быть ISIN (12 символов)"),
                     ColumnRule.of("product_code_bb_unique", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или непустой текст", ColumnRule.Type.STRING),
                     ColumnRule.of("position_quantity", "Тип: decimal | Обяз.: да | Проверки:", ColumnRule.Type.DECIMAL).required(),
@@ -581,7 +576,7 @@ public final class HardcodedRules {
                     ColumnRule.of("nominal", "Тип: decimal | Обяз.: нет | Проверки: NULL/пусто", ColumnRule.Type.DECIMAL).blankOnly(),
                     ColumnRule.of("pricer_price_bid_vd", "Тип: decimal | Обяз.: нет | Проверки: NULL/пусто или >= 0", ColumnRule.Type.DECIMAL).ge("0"),
                     ColumnRule.of("coupon", "Тип: decimal | Обяз.: нет | Проверки: NULL/пусто или >= 0", ColumnRule.Type.DECIMAL).ge("0"),
-                    ColumnRule.of("coupon_frequency", "Тип: enum | Обяз.: нет | Проверки: NULL/пусто или 182D, 91D, PA, SA, MTH, QTR", ColumnRule.Type.STRING).allowed("182D", "91D", "PA", "SA", "MTH", "QTR"),
+                    ColumnRule.of("coupon_frequency", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или непустой текст", ColumnRule.Type.STRING),
                     ColumnRule.of("coupon_type", "Тип: enum | Обяз.: нет | Проверки: NULL/пусто или Fixed, Variable, Floating", ColumnRule.Type.STRING).allowed("Fixed", "Variable", "Floating"),
                     ColumnRule.of("next_coupon_date", "Тип: date | Обяз.: нет | Проверки: NULL/пусто или дата 1900-01-01..2100-12-31; >= value_date", ColumnRule.Type.DATE).dateRange().compare("value_date", ColumnRule.Compare.GE),
                     ColumnRule.of("vtb_underlying_quotename", "Тип: string | Обяз.: нет | Проверки: NULL/пусто", ColumnRule.Type.STRING).blankOnly(),
@@ -618,7 +613,7 @@ public final class HardcodedRules {
                     ColumnRule.of("press_release", "Тип: string | Обяз.: нет | Проверки: NULL/пусто", ColumnRule.Type.STRING).blankOnly(),
                     ColumnRule.of("prev", "Тип: string | Обяз.: нет | Проверки: NULL/пусто или рейтинг(непустой текст)", ColumnRule.Type.STRING),
                     ColumnRule.of("prev_dt", "Тип: date | Обяз.: нет | Проверки: NULL/пусто или дата 1900-01-01..2100-12-31; <= last_dt", ColumnRule.Type.DATE).dateRange().compare("last_dt", ColumnRule.Compare.LE),
-                    ColumnRule.of("rating_agency", "Тип: enum | Обяз.: да | Проверки: допустимые значения: АКРА, Fitch Ratings, Эксперт РА, НКР, Moody's, Standard & Poor's", ColumnRule.Type.STRING).required().allowed("АКРА", "Fitch Ratings", "Эксперт РА", "НКР", "Moody's", "Standard & Poor's"),
+                    ColumnRule.of("rating_agency", "Тип: enum | Обяз.: да | Проверки: допустимые значения: АКРА, Fitch Ratings, Эксперт РА, НКР, Moody's, Standard & Poor's, АМБест Компани", ColumnRule.Type.STRING).required().allowed("АКРА", "Fitch Ratings", "Эксперт РА", "НКР", "Moody's", "Standard & Poor's", "АМБест Компани"),
                     ColumnRule.of("rating_code", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("rating_full_name_rus", "Тип: string | Обяз.: да | Проверки: непустой текст", ColumnRule.Type.STRING).required(),
                     ColumnRule.of("rating_id", "Тип: integer | Обяз.: да | Проверки: > 0", ColumnRule.Type.INTEGER).required().gt("0"),

@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Описание поддерживаемой таблицы. */
+/* описание рабочей таблицы */
 public final class TableSchema {
 
     private final String name;

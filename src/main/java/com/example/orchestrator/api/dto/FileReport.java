@@ -13,5 +13,6 @@ public record FileReport(
         int errorCount,
         int columnsWithErrors,
         List<ColumnReport> columnReports,
-        List<String> warnings) {
+        List<String> warnings
+) {
 }

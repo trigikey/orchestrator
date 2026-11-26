@@ -35,19 +35,17 @@ public class ApiController {
 
     @GetMapping("/tables")
     public List<TableInfo> tables() {
-        return HardcodedRules.tables().stream()
-                .map(this::toTableInfo)
-                .toList();
+        return HardcodedRules.tables().stream().map(this::toTableInfo).toList();
     }
 
     @PostMapping(value = "/validate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ValidationResponse validate(@RequestParam("files") List<MultipartFile> files) {
-        List<MultipartFile> nonEmpty = files.stream()
-                .filter(file -> file != null && !file.isEmpty())
-                .toList();
+        List<MultipartFile> nonEmpty = files.stream().filter(file -> file != null && !file.isEmpty()).toList();
+
         if (nonEmpty.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+
         return validationService.validate(nonEmpty);
     }
 

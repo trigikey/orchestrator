@@ -8,12 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-/**
- * Описание правил проверки одной колонки таблицы.
- *
- * <p>Правила задаются в {@link HardcodedRules} обычным Java-кодом. Никакие
- * внешние файлы с правилами во время работы приложения не читаются.</p>
- */
 public final class ColumnRule {
 
     public enum Type {
@@ -27,15 +21,11 @@ public final class ColumnRule {
         BOOLEAN
     }
 
-    /** Сравнение значения колонки со значением другой колонки. */
     public enum Compare {
-        /** значение <= значение другой колонки */
         LE,
-        /** значение >= значение другой колонки */
         GE
     }
 
-    /** Специальные проверки, которые нельзя выразить простым диапазоном. */
     public enum Custom {
         NONE,
         KEY_ACCOUNT_INSTR,
@@ -284,10 +274,7 @@ public final class ColumnRule {
         return ruleText;
     }
 
-    /**
-     * Текст условий проверки без служебных частей «Тип»/«Обяз.»/«Уник.».
-     * Именно он показывается в отчёте в поле {@code rule}.
-     */
+    /* обрезка проверок */
     public String conditionText() {
         int checksIndex = ruleText.indexOf("Проверки:");
         if (checksIndex < 0) {

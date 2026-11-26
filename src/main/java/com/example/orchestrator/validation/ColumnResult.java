@@ -6,7 +6,7 @@ import com.example.orchestrator.rules.ColumnRule;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Накопитель результата проверки одной колонки. */
+/* результат проверки одной колонки */
 final class ColumnResult {
 
     static final int MAX_ISSUES = 10;

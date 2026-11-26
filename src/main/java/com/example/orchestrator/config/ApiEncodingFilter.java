@@ -8,11 +8,10 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
+/* Приводит Content-Type ответов апи к application/json;charset=UTF-8 */
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-/** Приводит Content-Type API-ответов к application/json;charset=UTF-8. */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ApiEncodingFilter extends OncePerRequestFilter {

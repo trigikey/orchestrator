@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-/** Проверка одной книги Excel по захардкоженным правилам. */
+/* проверка одной таблички */
 public final class WorkbookValidator {
 
     private static final int HEADER_SCAN_ROWS = 25;
@@ -615,9 +615,6 @@ public final class WorkbookValidator {
                 if (headers.isEmpty()) {
                     continue;
                 }
-                if (looksLikeRuleRow(sheet.getRow(rowIndex + 1))) {
-                    continue;
-                }
                 for (TableSchema schema : HardcodedRules.tables()) {
                     HeaderMatch match = match(headers, schema);
                     if (match == null) {
@@ -632,33 +629,6 @@ public final class WorkbookValidator {
             }
         }
         return best;
-    }
-
-    /**
-     * Отличает строку правил из служебной книги validation.xlsx от строки данных.
-     * Если сразу под шапкой идёт строка, целиком состоящая из «Тип: ...»,
-     * «Обяз.: ...», «Проверки: ...», это не выгрузка, а описание правил.
-     */
-    private boolean looksLikeRuleRow(Row row) {
-        if (row == null) {
-            return false;
-        }
-        int nonEmpty = 0;
-        int ruleCells = 0;
-        for (Cell cell : row) {
-            String value = cellToString(cell).trim();
-            if (value.isEmpty()) {
-                continue;
-            }
-            nonEmpty++;
-            String lower = value.toLowerCase(Locale.ROOT);
-            if (lower.startsWith("тип:")
-                    || lower.startsWith("обяз.:")
-                    || lower.startsWith("проверки:")) {
-                ruleCells++;
-            }
-        }
-        return nonEmpty >= 2 && ruleCells == nonEmpty;
     }
 
     private HeaderMatch match(List<HeaderCell> headers, TableSchema schema) {

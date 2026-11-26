@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Принимает файлы и формирует общий отчёт. */
 @Service
 public class ValidationService {
 

@@ -11,7 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 
-/** Разбор строковых значений ячеек. */
+/* разбор значений клеток */
 public final class ValueParser {
 
     private static final List<DateTimeFormatter> DATE_TIME_FORMATS = List.of(
@@ -38,6 +38,10 @@ public final class ValueParser {
         String value = raw.trim();
         if (value.isEmpty()) {
             return null;
+        }
+
+        if (value.matches("[+-]?\\d{1,3}(,\\d{3})+\\.\\d+")) {
+            value = value.replace(",", "");
         }
         try {
             return new BigDecimal(value);
@@ -72,12 +76,12 @@ public final class ValueParser {
         try {
             return LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME);
         } catch (DateTimeParseException ignored) {
-            // пробуем формат без долей секунды
+
         }
         try {
             return LocalTime.parse(value, DateTimeFormatter.ofPattern("HH:mm:ss", Locale.ROOT));
         } catch (DateTimeParseException ignored) {
-            // Excel часто хранит время как дату-время; берём время из неё.
+
             LocalDateTime dateTime = dateTime(value);
             return dateTime == null ? null : dateTime.toLocalTime();
         }
@@ -97,32 +101,30 @@ public final class ValueParser {
             return null;
         }
 
-        // ISO-формат с датой и временем, в том числе с долями секунды.
         String iso = value.indexOf(' ') > 0 ? value.replace(' ', 'T') : value;
         try {
             return LocalDateTime.parse(iso, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (DateTimeParseException ignored) {
-            // пробуем другие форматы
+
         }
 
         for (DateTimeFormatter formatter : DATE_TIME_FORMATS) {
             try {
                 return LocalDateTime.parse(value, formatter);
             } catch (DateTimeParseException ignored) {
-                // пробуем следующий формат
+
             }
         }
 
-        // Дата без времени.
         for (DateTimeFormatter formatter : DATE_FORMATS) {
             try {
                 return LocalDate.parse(value, formatter).atStartOfDay();
             } catch (DateTimeParseException ignored) {
-                // пробуем следующий формат
+
             }
         }
 
-        // Компактные форматы: YYYYMMDD и YYYYMM.
+        //  YYYYMMDD YYYYMM
         if (value.matches("\\d{8}")) {
             try {
                 return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE).atStartOfDay();
@@ -139,7 +141,6 @@ public final class ValueParser {
             }
         }
 
-        // Дата-время с зоной/смещением.
         try {
             return OffsetDateTime.parse(value).toLocalDateTime();
         } catch (DateTimeParseException ignored) {

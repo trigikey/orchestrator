@@ -2,7 +2,7 @@ package com.example.orchestrator.validation;
 
 import com.example.orchestrator.rules.TableSchema;
 
-/** Значения одной строки листа, упорядоченные как колонки схемы. */
+/* одна строка листа в порядке колонок схемы */
 public final class RowData {
 
     private final String[] values;
